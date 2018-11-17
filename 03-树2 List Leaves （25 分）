@@ -1,0 +1,103 @@
+03-树2 List Leaves （25 分）
+Given a tree, you are supposed to list all the leaves in the order of top down, and left to right.
+
+Input Specification:
+Each input file contains one test case. For each case, the first line gives a positive integer N (≤10) which is the total number of nodes in the tree -- and hence the nodes are numbered from 0 to N−1. Then N lines follow, each corresponds to a node, and gives the indices of the left and right children of the node. If the child does not exist, a "-" will be put at the position. Any pair of children are separated by a space.
+
+Output Specification:
+For each test case, print in one line all the leaves' indices in the order of top down, and left to right. There must be exactly one space between any adjacent numbers, and no extra space at the end of the line.
+
+Sample Input:
+8
+1 -
+- -
+0 -
+2 7
+- -
+- -
+5 -
+4 6
+Sample Output:
+4 1 5
+
+我的代码：
+#include <iostream>
+#include <queue>
+
+using namespace std;
+
+#define maxsize 10
+#define Null -1
+
+struct que_node
+{
+	int index;
+	int left;
+	int right;
+}Tree[maxsize];
+
+int main()
+{
+	int n, check[maxsize] = { 0 },root;
+	char temp_left, temp_right;
+	cin >> n;
+	for (int i = 0; i < n; i++)
+	{
+		Tree[i].index = i;
+		cin >> temp_left >> temp_right;
+		if (temp_left!='-')
+		{
+			Tree[i].left = temp_left-'0';
+			check[Tree[i].left] = 1;
+		}
+		else
+		{
+			Tree[i].left = Null;
+		}
+		if (temp_right != '-')
+		{
+			Tree[i].right = temp_right - '0';
+			check[Tree[i].right] = 1;
+		}
+		else
+		{
+			Tree[i].right = Null;
+		}
+	}
+	int i = 0;
+	while (check[i++])
+	{
+
+	}
+	root = i - 1;
+	int count = 0;  // 结尾不能有空格  so立个flag
+	queue < struct que_node> q;
+	struct que_node curNode=Tree[root];
+	q.push(curNode);
+	for (int i = 0; i < n; i++)
+	{
+		if (curNode.left!=Null)
+		{
+			q.push(Tree[curNode.left]);
+		}
+		if (curNode.right != Null)
+		{
+			q.push(Tree[curNode.right]);
+		}
+		if (curNode.left == Null && curNode.right==Null)
+		{
+			if (count==0) // 结尾不能有空格  
+			{
+				cout << curNode.index;
+				count = 1;
+			}
+			else
+			{
+				cout << " " << curNode.index;
+			}			
+		}
+		q.pop();
+		curNode = q.front();
+	}
+	return 0;
+}
