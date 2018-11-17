@@ -1,0 +1,180 @@
+03-树1 树的同构 （25 分）
+给定两棵树T1和T2。如果T1可以通过若干次左右孩子互换就变成T2，则我们称两棵树是“同构”的。例如图1给出的两棵树就是同构的，因为我们把其中一棵树的结点A、B、G的左右孩子互换后，就得到另外一棵树。而图2就不是同构的。
+
+
+图1
+
+
+
+图2
+
+现给定两棵树，请你判断它们是否是同构的。
+输入格式:
+输入给出2棵二叉树树的信息。对于每棵树，首先在一行中给出一个非负整数N (≤10)，即该树的结点数（此时假设结点从0到N−1编号）；随后N行，第i行对应编号第i个结点，给出该结点中存储的1个英文大写字母、其左孩子结点的编号、右孩子结点的编号。如果孩子结点为空，则在相应位置上给出“-”。给出的数据间用一个空格分隔。注意：题目保证每个结点中存储的字母是不同的。
+
+输出格式:
+如果两棵树是同构的，输出“Yes”，否则输出“No”。
+
+输入样例1（对应图1）：
+8
+A 1 2
+B 3 4
+C 5 -
+D - -
+E 6 -
+G 7 -
+F - -
+H - -
+8
+G - 4
+B 7 6
+F - -
+A 5 1
+H - -
+C 0 -
+D - -
+E 2 -
+输出样例1:
+Yes
+输入样例2（对应图2）：
+8
+B 5 7
+F - -
+A 0 3
+C 6 -
+H - -
+D - -
+G 4 -
+E 1 -
+8
+D 6 -
+B 5 -
+E - -
+H - -
+C 0 2
+G - 3
+F - -
+A 1 4
+输出样例2:
+No
+
+我的代码：
+#include <iostream>
+
+using namespace std;
+
+#define maxTree 11
+#define Null -1
+
+typedef struct tree_node *BinTree;
+
+struct tree_node
+{
+	char data;
+	int left;
+	int right;
+}T1[maxTree],T2[maxTree];
+
+int BuildTree(BinTree T) //写成int BuildTree(struct tree_node T[])一样的  数组实质是指针嘛
+{	//还在担心check数组（maxTree=10）>（n=8）
+	//会有多出来的那两个0 和根的0混淆 
+	//实际上代表位置的那些值都是从0到8的  
+	//这样一来 肯定只用到check的前八个元素 
+	//确定root的时候找到第一个为0的就是根了
+	int n, check[maxTree] = { 0 };//check用来寻找根节点的  只有根不被指向   被指向的都赋为1  剩下为0的就是根
+	cin >> n;
+	char temp_left, temp_right;
+	int root=-1;
+	if (n)
+	{
+		for (int i = 0; i < n; i++)
+		{
+			cin >> T[i].data >> temp_left >> temp_right;
+			if (temp_left != '-')
+			{
+				T[i].left = temp_left - '0';//巧妙从char转化为int
+				check[T[i].left] = 1;
+			}
+			else
+			{
+				T[i].left = Null;
+			}
+
+			if (temp_right != '-')
+			{
+				T[i].right = temp_right - '0';
+				check[T[i].right] = 1;
+			}
+			else
+			{
+				T[i].right = Null;
+			}
+		}
+		int i = 0;
+		while (check[i++])
+		{
+
+		}
+		/*for (i = 0; i < n; i++)
+		{
+			if (!check[i])
+				break;
+		}*/
+		root = i-1;
+	}
+
+	return root;
+}
+
+int Isomorphic(int root1, int root2)
+{
+	//都为空
+	if (root1==Null&&root2==Null) 
+	{
+		return 1; 
+	}
+	//一者为空 另一者不空
+	if ((root1==Null&&root2!=Null)||(root1!=Null&&root2==Null))
+	{
+		return 0;
+	}
+	//根节点都不一样
+	if (T1[root1].data!=T2[root2].data)
+	{
+		return 0;
+	}
+	//左边都为空  那就看看右边
+	if (T1[root1].left==Null&&T2[root2].left==Null)
+	{
+		return Isomorphic(T1[root1].right, T2[root2].right);
+	}
+	//左边都不空 且左子树的第一个点相同  看看左边和左边 右边和右边同构否
+	if (((T1[root1].left!=Null)&&(T2[root2].left!=Null))
+		&&(T1[T1[root1].left].data==T2[T2[root2].left].data))
+	{
+		return (Isomorphic(T1[root1].left, T2[root2].left)
+			&& Isomorphic(T1[root1].right, T2[root2].right));
+	}
+	else //上面if的情况取反  得到第一种情况：一个左边空右边不空  一个左边不空右边空
+	{ //第二种：两者左子树的第一个点不同 则有可能根节点的左右子树互换了 就看看T1的左边和T2的右边同构否  以及T1的右边和T2的左边同构否
+		return (Isomorphic(T1[root1].left, T2[root2].right)
+			&& Isomorphic(T1[root1].right, T2[root2].left));
+	}
+}
+
+int main()
+{
+	
+	int root1 = BuildTree(T1);
+	int root2 = BuildTree(T2);
+	if (Isomorphic(root1, root2)) //没看清题目要求输出写成了“YES”和“NO”
+								//太粗心 白白耽误太多时间
+	{
+		cout << "Yes" << endl;
+	}
+	else
+	{
+		cout << "No" << endl;
+	}
+	return 0;
+}
